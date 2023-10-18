@@ -54,6 +54,10 @@ En la notebook "Yoga_pose_detection.ipynb" podran encontar el siguiente contenid
 10.	Estimación de posturas en video<br>
 11.	Interfaz<br>
 
+----------------------------------------------
+
+# Interfaz
+
 **En la carpeta "interface" se encuentra la apliación final que pueden utilizarla corriendo el archivo "deploy.py"**
 
 Al detectar la postura la aplicación medirá los ángulos característicos de la misma y los mostrará en pantalla para que el usuario pueda hacer las correcciones necesarias.
