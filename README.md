@@ -6,11 +6,11 @@
 
 ## Yoga Pose Estimation 
 
-## Autor: Juan Ignacio Ribet
+### Autor: Juan Ignacio Ribet
 
 ### Director:  Juan Pablo Pizarro (Globant)
 
-### Programa de vinculacion con empresa Globant
+#### Programa de vinculacion con empresa Globant
 
 Resumen
 
