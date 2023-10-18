@@ -67,4 +67,5 @@ Tambien se podra ver un indicador led que se verá:
 <img src=doc/video_interface.png>
 </p>
 
+En la parte de arriba de la pantalla se podrá ver la postura detectada y la probabilidad calculada. Abajo una imagen de la postura para referencia del usuario.
 
