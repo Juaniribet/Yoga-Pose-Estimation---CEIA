@@ -27,7 +27,7 @@ La siguiente aplicación se realizó en el marco del trabajo final de la Carrera
 # Resumen
 
 Esta aplicación consiste en un detector de postura de yoga o asanas desarrollado para la empresa Globant. 
-El proyecto pretende obtener el mínimo producto viable de una aplicación para entrenamiento de yoga, 
+El proyecto pretende obtener la prueba de concepto (PoC) de una aplicación para entrenamiento de yoga, 
 en donde se detecte la postura mediante algoritmos de aprendizaje de máquina y visión por computadora, 
 y se le de soporte al usuario para realizarlas de forma correcta.
 
