@@ -16,6 +16,7 @@ import pandas as pd
 import streamlit as st
 from PIL import Image
 import math
+import tempfile
 
 
 im = Image.open('pages/Data/loto.png')
@@ -78,6 +79,15 @@ demo_video = st.sidebar.button('video demostración')
 
 if demo_video:
     run = True
+
+uploaded_file = st.sidebar.file_uploader("Choose a video")
+
+if uploaded_file is not None:
+    procesar_video = st.sidebar.button('Procesar video')
+    if procesar_video:
+        run = True
+
+
 
 with open('pages\Data\models\yoga_pose_detection_model.pkl', 'rb') as f:
     model = pickle.load(f)
@@ -195,6 +205,13 @@ if run:
     if demo_video:
         cap = cv2.VideoCapture("pages\Data\\sample_video.mp4")
         cap.set(cv2.CAP_PROP_FPS,5)
+
+    if procesar_video:
+        tfile = tempfile.NamedTemporaryFile(delete=False) 
+        tfile.write(uploaded_file.read())
+        cap = cv2.VideoCapture(tfile.name)
+        cap.set(cv2.CAP_PROP_FPS,5)
+    
     else:
         cap = cv2.VideoCapture(camera)
     frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
