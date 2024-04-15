@@ -8,34 +8,26 @@ DATE: 18-Sep-2023
 """
 
 import cv2
+import json
+import openai_assist.openai_resp as opr
 import streamlit as st
 import pandas as pd
 from PIL import Image
 
-im = Image.open('pages/Data/loto.png')
+def save_dict_to_file(dictionary, filename):
+    with open(filename, 'w') as file:
+        json.dump(dictionary, file)
 
-st.set_page_config(
-    page_title="Detector de posturas de Yoga",
-    page_icon=im,
-    layout="wide")
+def load_dict_from_file(filename):
+    with open(filename, 'r') as file:
+        return json.load(file)
 
-st.title("yoga pose detector")
+def is_dict_empty(dictionary):
+    return not bool(dictionary)
 
-st.sidebar.title('Resultados')
-
-posture = st.radio(
-    "Elige la postura",
-    ["Todo", "downdog", "goddess", "tree", "warrior"])
-
-# Delete the information in the report DataFrame
-clean = st.sidebar.button('Limpiar datos')
-if clean:
-    report_df = pd.DataFrame(columns=['pose',
-                                      'punto',
-                                      'ang optimo',
-                                      'ang medido medio'])
-    report_df.to_csv('pages/Data/report.csv', index=False)
-
+def get_assit_resp(dic, poses):
+    for p in poses:
+        st.write(dic[p])
 
 def report_images(report, poses):
     '''
@@ -152,16 +144,7 @@ def report_images(report, poses):
 
         st.image(annotated_image)
 
-
-# Load the report DataFrame
-angle_mesure = pd.read_csv('pages/Data/report.csv')
-angle_mesure.sort_values(by=['pose'])
-
-# If there is data in the report it will be transformed to be presented.
-if angle_mesure.shape[0] == 0:
-    '''No hay datos'''
-else:
-    # Calculate the diference between the optimal angle and the mean angle)
+def transf_data(angle_mesure):
     angle_mesure['dif'] = abs(
         angle_mesure['ang optimo']-angle_mesure['ang medido medio'])
     # Add column 'mejor' where is going to be the best angle reached
@@ -190,65 +173,149 @@ else:
     for i in range(reporte_final.shape[0]):
         reporte_final.loc[reporte_final.index == i, 'punto'] = int(
             ''.join(list(reporte_final['punto'][i])[5:7]))
-    # Final dataframe to use for the visulization
-    # Informationin reporte_final dataframe: {  'pose': Name of the yoga posture,
-    #                                           'punto': central point of the measure angle,
-    #                                           'ang optimo': optimal angle,
-    #                                           'ang medido medio': Mean angle,
-    #                                           'mejor': Best angle}
+    
+    return reporte_final
 
-    # Time report: Load the time report
-    report_time = pd.read_csv('pages\Data\\report_time.csv')
-    report_time = report_time.groupby(by=['pose']).sum().astype(int).reset_index()
-    # Information in report_time DataFrame: {'pose': Name of the yoga posture,
-    #                                       'time': total time for each pose in seconds}
-    total_time = report_time['time'].sum()
 
-    # If the user select a specific position it will show only its example image
-    if posture != "Todo":
-        suma = (reporte_final['pose'] == posture).sum()
-        posture = [posture]
-        if posture[0] in ['warrior', 'tree']:
-            posture_inv = str(posture[0]) + '_inv'
-            posture.append(posture_inv)
+if __name__== '__main__':
+    im = Image.open('pages/Data/loto.png')
 
-        if suma > 0:
-            col1, col2 = st.columns([2, 1])
+    st.set_page_config(
+        page_title="Detector de posturas de Yoga",
+        page_icon=im,
+        layout="wide")
 
-            if len(report_time['time'][report_time['pose'] == posture[0]]):
+    st.title("Yoga Pose Detector")
 
-                with col1:
-                    report_images(reporte_final, posture)
+    st.markdown(
+        """
+        <style>
+        [data-testid="stSidebar"][aria_expanded="true"] > dic:first-child{
+            width:350x
+        }
 
-                with col2:
-                    st.image(
-                        "pages\Data\images_display\\Landmarks.png")
-                    # Show the total time for each posture
-                    time_pose = report_time['time'][report_time['pose'] == posture[0]].item(
-                    )
-                    st.header(f'Tiempo de la postura: {time_pose} segundos')
+        [data-testid="stSidebar"][aria_expanded="false"] > dic:first-child{
+            width:350x
+            margin-left: -350x
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    """
+    Puede elegir todas las posturas juntas o una a la vez.
+
+    Presionando el botón 'Asistente IA' obtendrá un análisis de los resultados generados por Inteligencia Artificial Generativa.
+    (Este análisis puede contener errores)
+    """
+
+    st.sidebar.title('Resultados')
+
+    posture = st.sidebar.radio(
+        "Elige la postura",
+        ["Todo", "downdog", "goddess", "tree", "warrior"])
+
+
+    dict_filename = 'pages/Data/assit_resp.json'
+
+    ## Delete the information in the report DataFrame
+    # clean = st.sidebar.button(':red[Limpiar datos]')
+    # if clean:
+    #     report_df = pd.DataFrame(columns=['pose',
+    #                                     'punto',
+    #                                     'ang optimo',
+    #                                     'ang medido medio'])
+    #     report_df.to_csv('pages/Data/report.csv', index=False)
+    #     dic_assist_resp = {}
+    #     save_dict_to_file(dic_assist_resp, dict_filename)
+
+    # Load the report DataFrame
+    angle_mesure = pd.read_csv('pages/Data/report.csv')
+    angle_mesure.sort_values(by=['pose'])
+
+    assist_result = st.sidebar.button(':blue[Asistente IA]')
+
+    dic_assist_resp = load_dict_from_file(dict_filename)
+
+    if assist_result:
+        if is_dict_empty(dic_assist_resp):
+            reporte_final = transf_data(angle_mesure)
+            dic_assist_resp = opr.yoga_assistant(reporte_final)
+            save_dict_to_file(dic_assist_resp, dict_filename)
+    if not is_dict_empty(dic_assist_resp):
+        new_analisis = st.sidebar.button('Quiero un nuevo analisis')
+        if new_analisis:
+            reporte_final = transf_data(angle_mesure)
+            dic_assist_resp = opr.yoga_assistant(reporte_final)
+            save_dict_to_file(dic_assist_resp, dict_filename)
+
+    # If there is data in the report it will be transformed to be presented.
+    if angle_mesure.shape[0] == 0:
+        '''No hay datos'''
+    else:
+        reporte_final = transf_data(angle_mesure)
+
+        # Time report: Load the time report
+        report_time = pd.read_csv('pages\Data\\report_time.csv')
+        report_time = report_time.groupby(by=['pose']).sum().astype(int).reset_index()
+        # Information in report_time DataFrame: {'pose': Name of the yoga posture,
+        #                                       'time': total time for each pose in seconds}
+        total_time = report_time['time'].sum()
+
+        # If the user select a specific position it will show only its example image
+        if posture != "Todo":
+            suma = (reporte_final['pose'] == posture).sum()
+            posture = [posture]
+            if posture[0] in ['warrior', 'tree']:
+                posture_inv = str(posture[0]) + '_inv'
+                posture.append(posture_inv)
+
+            if suma > 0:
+                col1, col2 = st.columns([2, 1])
+
+                if len(report_time['time'][report_time['pose'] == posture[0]]):
+                
+                    with col1:
+                        for pst in posture:
+                            pst = [pst]
+                            report_images(reporte_final, pst)
+
+                            if not is_dict_empty(dic_assist_resp):
+                                get_assit_resp(dic_assist_resp, pst)
+
+                    with col2:
+                        st.image(
+                            "pages\Data\images_display\\Landmarks.png")
+                        # Show the total time for each posture
+                        time_pose = report_time['time'][report_time['pose'] == posture[0]].item()
+                        st.header(f'Tiempo de la postura: {time_pose} segundos')
+                else:
+                    '''
+                    ## No hay datos de la postura
+                    '''
             else:
                 '''
                 ## No hay datos de la postura
                 '''
+        # If the user select to see all the example image report at once
         else:
-            '''
-            ## No hay datos de la postura
-            '''
-    # If the user select to see all the example image report at once
-    else:
-        st.header(f'Tiempo total de entrenamiento: {total_time} segundos')
-        poses = []
-        for pose in sorted(reporte_final['pose'].unique()):
-            if len(report_time['time'][report_time['pose'] == pose]):
-                poses.append(pose)
+            st.header(f'Tiempo total de entrenamiento: {total_time} segundos')
+            poses = []
+            for pose in sorted(reporte_final['pose'].unique()):
+                if len(report_time['time'][report_time['pose'] == pose]):
+                    #poses.append(pose)
+                    pose = [pose]
 
-        report_images(reporte_final, poses)
+                    report_images(reporte_final, pose)
 
-        #st.table(reporte_final)
+                    if not is_dict_empty(dic_assist_resp):
+                        get_assit_resp(dic_assist_resp, pose)
 
-video_file = open('pages\Data\\video.mp4', 'rb')
-video_bytes = video_file.read()
+            # st.table(reporte_final)
 
-if video_bytes:
-    st.video(video_bytes)
+    video_file = open('pages\Data\\video.mp4', 'rb')
+    video_bytes = video_file.read()
+
+    if video_bytes:
+        st.video(video_bytes)
