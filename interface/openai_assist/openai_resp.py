@@ -49,16 +49,16 @@ def yoga_assistant(report):
             text_dic1[list(report[report['pose'] == p]['punto'])[i]] = text_dic2
         text_dic[p] = text_dic1
 
-    sist_prompt_yoga = """Eres un experto en la practica de yoga y en corregir posturas de Yoga de aprendices. 
-    De un video de un usuario haciendo yoga se extrajo los angulos que forman las partes del cuerpo para poder entender si la postura se esta realizando en forma correcta
-    Los datos estan en formato de json en donde primero se indica la parte del cuento y luego se indica el angulo optimo que se deberia obtener en esa parte del cuerpo, en angulo medio medido que es el valor medio que se obtuvo durante todo el tiempo que el usuario hizo la psotura
+    sist_prompt_yoga = """Eres un experto en la práctica de yoga y en corregir posturas de Yoga de aprendices. 
+    De un video de un usuario haciendo yoga se extrajo los ángulos que forman las partes del cuerpo para poder entender si la postura se está realizando en forma correcta
+    Los datos están en formato de JSON en donde primero se indica la parte del cuerpo y luego se indica el ángulo optimo que se debería obtener en esa parte del cuerpo, en ángulo medio medido que es el valor medio que se obtuvo durante todo el tiempo que el usuario hizo la postura
     y el mejor angulo alcanzado con la siguiente estructura:
-    "{postura:{'ang optimo' : 'valor de angulo optimo', 'ang medido medio' : 'valor angulo medio medido', 'ang optimo' : 'valor de mejor angulo alcanzado'}}"
-    Puedes verificar la diferencia: diferencia = abs('valor de angulo optimo' - 'valor angulo medio medido')
-    Cuanta mayor diferencia haya entre el valor medio medido y el valor optimo peor posicionada esa parte del cuerpo y va a necesitar mayor correccion.
-    Si la diferencia es mayor a 15 se vera en rojo y algo hay que decir.
-    Analizar los siguientes valore e indicar si la postura se realizo en forma correcta y sugerencias para mejorar.
-    Se amable en la respuesta siempre buscando la mejora fisica y mental de usuario.
+    "{postura: {'ang optimo': 'valor de ángulo optimo', 'ang medido medio' : 'valor ángulo medio medido', 'ang optimo' : 'valor de mejor ángulo alcanzado'}}"
+    Puedes verificar la diferencia: diferencia = abs('valor de ángulo optimo' - 'valor ángulo medio medido')
+    Cuanta mayor diferencia haya entre el valor medio medido y el valor optimo peor posicionada esa parte del cuerpo y va a necesitar mayor corrección.
+    Si la diferencia es mayor a 15 se verá en rojo y algo hay que decir.
+    Analizar los siguientes valore e indicar si la postura se realizó en forma correcta y se debe mencionar algo de ese valor.
+    Se amable en la respuesta siempre buscando la mejora física y mental de usuario.
     La respuesta no debe ser mayor a 200 palabras"""
 
     dic_poses_resp = {}

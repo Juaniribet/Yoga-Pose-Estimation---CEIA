@@ -221,7 +221,7 @@ if __name__== '__main__':
                 tfile.write(uploaded_file.read())
                 cap = cv2.VideoCapture(tfile.name)
                 #cap.set(cv2.CAP_PROP_FPS,5)
-                fps_video = cap.get(cv2.CAP_PROP_FPS)
+                fps_video = int(cap.get(cv2.CAP_PROP_FPS))
         
         else:
             cap = cv2.VideoCapture(camera)
@@ -271,7 +271,7 @@ if __name__== '__main__':
                     break
 
                 if (demo_video or (uploaded_file is not None)) and fast_process:
-                    if frame_number % (fps_video/15) == 0:
+                    if frame_number % int((fps_video/15)) == 0:
                         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                         image.flags.writeable = False
                     else:

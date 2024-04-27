@@ -219,7 +219,7 @@ if __name__== '__main__':
 
     dict_filename = 'pages/Data/assit_resp.json'
 
-    ## Delete the information in the report DataFrame
+    # # Delete the information in the report DataFrame
     # clean = st.sidebar.button(':red[Limpiar datos]')
     # if clean:
     #     report_df = pd.DataFrame(columns=['pose',
