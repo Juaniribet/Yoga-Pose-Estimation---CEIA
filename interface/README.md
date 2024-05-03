@@ -25,6 +25,8 @@ pandas==2.0.3
 
 scikit-learn==1.3.1
 
+openai
+
 scipy==1.11.2
 
 seaborn==0.13.0
