@@ -219,17 +219,6 @@ if __name__== '__main__':
 
     dict_filename = 'pages/Data/assit_resp.json'
 
-    # # Delete the information in the report DataFrame
-    # clean = st.sidebar.button(':red[Limpiar datos]')
-    # if clean:
-    #     report_df = pd.DataFrame(columns=['pose',
-    #                                     'punto',
-    #                                     'ang optimo',
-    #                                     'ang medido medio'])
-    #     report_df.to_csv('pages/Data/report.csv', index=False)
-    #     dic_assist_resp = {}
-    #     save_dict_to_file(dic_assist_resp, dict_filename)
-
     # Load the report DataFrame
     angle_mesure = pd.read_csv('pages/Data/report.csv')
     angle_mesure.sort_values(by=['pose'])
@@ -317,5 +306,19 @@ if __name__== '__main__':
     video_file = open('pages\Data\\video.mp4', 'rb')
     video_bytes = video_file.read()
 
-    if video_bytes:
+    if video_bytes:   
         st.video(video_bytes)
+    
+    # Delete the information in the report DataFrame
+    st.sidebar.write("----")
+    clean = st.sidebar.button(':red[Borrar datos ⚠️]')
+    if clean:
+        report_df = pd.DataFrame(columns=['pose',
+                                        'punto',
+                                        'ang optimo',
+                                        'ang medido medio'])
+        report_df.to_csv('pages/Data/report.csv', index=False)
+        dic_assist_resp = {}
+        save_dict_to_file(dic_assist_resp, dict_filename)
+    
+    st.sidebar.write(':red[Si borra los datos no los podra recuperar.]')

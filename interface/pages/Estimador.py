@@ -226,9 +226,18 @@ if __name__== '__main__':
         else:
             cap = cv2.VideoCapture(camera)
             pass
-        frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        original_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        original_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        aspect_ratio = original_width / original_height
 
+        max_width = 1024
+        max_height = 768
+
+        frame_width = min(original_width, max_width)
+        frame_height = int(frame_width / aspect_ratio)
+        if frame_height > max_height:
+            frame_height = max_height
+            frame_width = int(frame_height * aspect_ratio)
 
         result = cv2.VideoWriter('pages/Data/video.mp4', 
                                 cv2.VideoWriter_fourcc(*'VIDX'),
@@ -261,7 +270,9 @@ if __name__== '__main__':
                         min_tracking_confidence=0.5) as pose:
 
             while cap.isOpened():
+
                 success, frame = cap.read()
+
                 if stop:
                     break
                 if not success:
@@ -269,6 +280,8 @@ if __name__== '__main__':
                     break
                 if frame is None:
                     break
+
+                frame = cv2.resize(frame, (frame_width, frame_height))
 
                 if (demo_video or (uploaded_file is not None)) and fast_process:
                     if frame_number % int((fps_video/15)) == 0:
@@ -281,7 +294,8 @@ if __name__== '__main__':
                     # Recolor Feed
                     image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                     image.flags.writeable = False
-                
+
+
                 # Mido FPS
                 new_frame_time = time.time()
                 fps = 1/(new_frame_time-prev_frame_time)
@@ -509,19 +523,19 @@ if __name__== '__main__':
                     # Print if the body is not fully visible                    
                     else:
                         cv2.putText(image,
-                                    "Make your Full",
+                                    "Por favor que todo",
                                     (50, 35),
                                     cv2.FONT_HERSHEY_SIMPLEX,
-                                    1,
+                                    0.5,
                                     (66, 245, 236),
-                                    3)
+                                    2)
                         cv2.putText(image,
-                                    "body visible",
+                                    "el cuerpo sea visible",
                                     (50, 65),
                                     cv2.FONT_HERSHEY_SIMPLEX,
-                                    1,
+                                    0.5,
                                     (66, 245, 236),
-                                    3)
+                                    2)
                         cv2.circle(image,
                                 circle_coord,
                                 40,
